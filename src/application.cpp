@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <cstring>
-#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <unordered_set>
+
+#include "./utils.hpp"
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
@@ -24,21 +25,6 @@ constexpr bool enableValidationLayers = true;
 namespace aufr {
 
 namespace {
-std::vector<char> readFile(const std::string &filename) {
-  std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-  if (!file.is_open()) {
-    throw std::runtime_error("failed to open file '" + filename);
-  }
-
-  size_t fileSize = (size_t) file.tellg();
-  std::vector<char> buffer(fileSize);
-  file.seekg(0);
-  file.read(buffer.data(), fileSize);
-  file.close();
-
-  return buffer;
-}
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                       const VkAllocationCallbacks *pAllocator,
@@ -58,6 +44,38 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     func(instance, debugMessenger, pAllocator);
   }
 }
+
+
+std::string describePhysicalDeviceType(VkPhysicalDeviceType deviceType) {
+  switch (deviceType) {
+    case VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_CPU:
+      return "CPU";
+    case VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+      return "integrated GPU";
+    case VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+      return "virtual GPU";
+    case VkPhysicalDeviceType::VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+      return "discrete GPU";
+    default:
+      return "other";
+  }
+}
+
+void describePhysicalDevice(VkPhysicalDevice device) {
+  VkPhysicalDeviceProperties deviceProperties;
+  VkPhysicalDeviceFeatures deviceFeatures;
+  vkGetPhysicalDeviceProperties(device, &deviceProperties);
+  vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+  std::cout << "== Device properties ==" << std::endl;
+  std::cout << "API version: " << deviceProperties.apiVersion << std::endl;
+  std::cout << "Device ID: " << deviceProperties.deviceID << std::endl;
+  std::cout << "Device name: " << deviceProperties.deviceName << std::endl;
+  std::cout << "Device type: " << describePhysicalDeviceType(deviceProperties.deviceType) << std::endl;
+  std::cout << "Driver version: " << deviceProperties.driverVersion << std::endl;
+  std::cout << "Max memory allocation count: " << deviceProperties.limits.maxMemoryAllocationCount << std::endl;
+}
+
 }  // namespace
 
 void Application::initWindow() {
@@ -102,7 +120,7 @@ void Application::createInstance() {
 
   VkApplicationInfo appInfo{};
   appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-  appInfo.pApplicationName = "Hello Triangle";
+  appInfo.pApplicationName = "Auf Render";
   appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
   appInfo.pEngineName = "No Engine";
   appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -245,6 +263,10 @@ void Application::pickPhysicalDevice() {
   std::vector<VkPhysicalDevice> devices(deviceCount);
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
   for (const auto &device : devices) {
+    describePhysicalDevice(device);
+  }
+
+  for (const auto &device : devices) {
     if (isDeviceSuitable(device)) {
       physicalDevice = device;
       break;
@@ -255,6 +277,7 @@ void Application::pickPhysicalDevice() {
     throw std::runtime_error("failed to find a suitable GPU!");
   }
 }
+
 
 bool Application::isDeviceSuitable(VkPhysicalDevice device) {
   QueueFamilyIndices indices = findQueueFamilies(device);
@@ -572,8 +595,8 @@ VkShaderModule Application::createShaderModule(const std::vector<char> &code) {
 }
 
 void Application::createGraphicsPipeline() {
-  const auto vertShaderCode = readFile("shaders/base.vert.spv");
-  const auto fragShaderCode = readFile("shaders/base.frag.spv");
+  const auto vertShaderCode = utils::readFile("shaders/base.vert.spv");
+  const auto fragShaderCode = utils::readFile("shaders/base.frag.spv");
 
   VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
   VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

@@ -13,7 +13,7 @@ struct QueueFamilyIndices {
   std::optional<uint32_t> graphicsFamily{};
   std::optional<uint32_t> presentFamily{};
 
-  bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
+  [[nodiscard]] bool isComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
 };
 
 struct SwapChainSupportDetails {
@@ -66,13 +66,13 @@ class Application {
 
   void cleanup();
 
-  void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+  static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
   void setupDebugMessenger();
 
-  std::vector<const char *> getRequiredExtensions();
+  static std::vector<const char *> getRequiredExtensions();
 
-  bool checkValidationLayerSupport();
+  static bool checkValidationLayerSupport();
 
   static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                                       VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -83,7 +83,7 @@ class Application {
 
   bool isDeviceSuitable(VkPhysicalDevice device);
 
-  bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+  static bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
   void createLogicalDevice();
 
@@ -93,9 +93,9 @@ class Application {
 
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
-  VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+  static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
-  VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+  static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
 
   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 

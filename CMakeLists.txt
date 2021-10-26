@@ -19,7 +19,7 @@ add_subdirectory(shaders)
 #message(sources ${SOURCES})
 #message(headers ${HEADERS})
 
-add_executable(${PROJECT_NAME} main.cpp src/application.hpp src/application.cpp ${HEADERS} ${SOURCES})
+add_executable(${PROJECT_NAME} main.cpp src/utils.hpp src/utils.cpp src/application.hpp src/application.cpp)
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
 target_link_libraries(${PROJECT_NAME} glfw)
 #target_link_libraries(${PROJECT_NAME} glm)

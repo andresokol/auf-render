@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.17)
 project(vulkan_demo)
 
-#set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -O1")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-#find_package(glm REQUIRED)
+find_package(glm REQUIRED)
 find_package(Vulkan REQUIRED)
+
+add_subdirectory(shaders)
 
 #include_directories(${PROJECT_SOURCE_DIR}/src)
 #include_directories(${PROJECT_SOURCE_DIR})

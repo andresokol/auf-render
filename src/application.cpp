@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <unistd.h>  // FIXME: unix only
 #include <unordered_set>
 
 constexpr uint32_t WIDTH = 800;
@@ -29,8 +28,7 @@ std::vector<char> readFile(const std::string &filename) {
   std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
   if (!file.is_open()) {
-    const std::string dirname = get_current_dir_name();
-    throw std::runtime_error("failed to open file '" + filename + "'! working dir: " + dirname);
+    throw std::runtime_error("failed to open file '" + filename);
   }
 
   size_t fileSize = (size_t) file.tellg();
@@ -574,8 +572,8 @@ VkShaderModule Application::createShaderModule(const std::vector<char> &code) {
 }
 
 void Application::createGraphicsPipeline() {
-  const auto vertShaderCode = readFile("../shaders/base.vert.spv");
-  const auto fragShaderCode = readFile("../shaders/base.frag.spv");
+  const auto vertShaderCode = readFile("shaders/base.vert.spv");
+  const auto fragShaderCode = readFile("shaders/base.frag.spv");
 
   VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
   VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
